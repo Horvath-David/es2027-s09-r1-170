@@ -1,6 +1,6 @@
 "use client"
 
-import { JSON_SERVER_URL } from "@/app/constants"
+import { API_URL, JSON_SERVER_URL } from "@/app/constants"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -42,9 +42,11 @@ import { Fragment, useEffect, useMemo, useState } from "react"
 export function ProjectPage() {
   const { id } = useParams()
 
+  const [hasLoaded, setHasLoaded] = useState(false)
+
   const [windDir, setWindDir] = useState("N")
   const [windSpeed, setWindSpeed] = useState(10)
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   const [isSimRunning, setIsSimRunning] = useState(false)
   const [turbineMap, setTurbineMap] = useState(
@@ -261,8 +263,44 @@ export function ProjectPage() {
   }
 
   useEffect(() => {
-    console.log({ powerMap, modifierMap })
-  }, [powerMap, modifierMap])
+    if (!data) return
+
+    const emptyMap: boolean[][] = Array(20).fill(Array(20).fill(false))
+    const map = emptyMap.map((val, x) =>
+      val.map(
+        (_, y) =>
+          data.cells.find((cell) => cell.x == x && cell.y == y)?.hasTurbine ??
+          false,
+      ),
+    )
+
+    setTurbineMap(map)
+    setHasLoaded(true)
+  }, [data])
+
+  useEffect(() => {
+    if (!hasLoaded || !data) return
+    const body: Project = {
+      ...data,
+      cells: data.cells.map((cell) => ({
+        ...cell,
+        hasTurbine: turbineMap[cell.x][cell.y],
+      })),
+    }
+
+    const controller = new AbortController()
+
+    fetch(`${API_URL}/project/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      signal: controller.signal,
+    })
+
+    return () => controller.abort()
+  }, [turbineMap, hasLoaded])
 
   return (
     <div
