@@ -9,10 +9,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "@/components/ui/dialog"
 import { Slider } from "@/components/ui/slider"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Project } from "@/lib/types"
 import { cn } from "@/lib/utils"
+import { DialogTitle } from "@radix-ui/react-dialog"
 import { useQuery } from "@tanstack/react-query"
 import {
   ArrowBigDown,
@@ -26,6 +33,8 @@ import {
   Loader2,
   Pause,
   Play,
+  WindIcon,
+  X,
 } from "lucide-react"
 import { useParams } from "next/navigation"
 import { Fragment, useEffect, useMemo, useState } from "react"
@@ -35,6 +44,7 @@ export function ProjectPage() {
 
   const [windDir, setWindDir] = useState("N")
   const [windSpeed, setWindSpeed] = useState(10)
+  const [open, setOpen] = useState(true)
 
   const [isSimRunning, setIsSimRunning] = useState(false)
   const [turbineMap, setTurbineMap] = useState(
@@ -176,6 +186,7 @@ export function ProjectPage() {
 
   function stopSim() {
     setIsSimRunning(false)
+    setSelectedTurbine(undefined)
   }
 
   function handleTileClick(x: number, y: number) {
@@ -186,6 +197,7 @@ export function ProjectPage() {
     if (isSimRunning) {
       if (getTileType({ x, y }) != "Turbine") return
       setSelectedTurbine({ x, y })
+      setOpen(true)
       return
     }
 
@@ -286,8 +298,15 @@ export function ProjectPage() {
                           <div
                             key={`${x},${y}`}
                             className={cn(
-                              "flex select-none items-center justify-center map-tile",
+                              "flex select-none items-center justify-center",
                               isSelected && "outlined-turbine",
+                              ((!isSimRunning &&
+                                (data?.cells ?? []).find(
+                                  (cell) => cell.x === x && cell.y === y,
+                                )?.type === "Grass" &&
+                                exclusionMap[x][y] <= 0) ||
+                                turbineMap[x][y]) &&
+                                "hover:!bg-white/50 cursor-pointer",
                             )}
                             onClick={() => handleTileClick(x, y)}
                             style={{
@@ -319,20 +338,107 @@ export function ProjectPage() {
                       })}
                   </Fragment>
                 ))}
-              {/* @for (int y = 0; y < 20; y++)
-                    {
-                        var _y = y;
-                        @for (int x = 0; x < 20; x++)
-                        {
-                            var _x = x;
-                            var isSelected = false;
-                            if (selectedTurbine is not null)
-                            {
-                                isSelected = selectedTurbine.Value.x == x && selectedTurbine.Value.y == y;
-                            }
-                            
-                        }
-                    } */}
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent>
+                  <DialogHeader className='border-b pb-6 -mx-6 px-6'>
+                    <DialogTitle className='flex items-center gap-4 text-xl leading-none'>
+                      <WindIcon />
+                      <span className='mb-0.5'>Turbine at </span>
+                      <code className='text-sm bg-muted py-1 px-4 rounded-md border border-foreground/20'>
+                        {selectedTurbine?.x} ; {selectedTurbine?.y}
+                      </code>
+                    </DialogTitle>
+                  </DialogHeader>
+
+                  <div className='flex flex-col my-2 gap-6'>
+                    <div className='flex gap-6'>
+                      <Card
+                        className='flex flex-col justify-between gap-4 p-4 flex-1 w-full'
+                        style={{
+                          background: colorMap[selectedTurbine?.x ?? 0][
+                            selectedTurbine?.y ?? 0
+                          ].replace("1)", "0.1)"),
+                        }}
+                      >
+                        <span className='font-semibold text-lg text-muted-foreground'>
+                          Power output:
+                        </span>
+                        <span className='ml-auto text-2xl font-semibold'>
+                          {powerMap[selectedTurbine?.x ?? 0][
+                            selectedTurbine?.y ?? 0
+                          ]?.toFixed(2)}{" "}
+                          kW
+                        </span>
+                      </Card>
+
+                      <Card className='flex flex-col justify-between gap-4 p-4 flex-1 w-full'>
+                        <span className='font-semibold text-lg text-muted-foreground'>
+                          Final modifier:
+                        </span>
+                        {(() => {
+                          const sum = modifierMap[
+                            `${selectedTurbine?.x ?? 0},${selectedTurbine?.y ?? 0}`
+                          ]?.reduce((a, b) => a + b.amount, 0)
+
+                          return (
+                            <span
+                              className={cn(
+                                "ml-auto text-2xl font-semibold",
+                                sum > 0 && "text-green-500",
+                                sum < 0 && "text-red-500",
+                              )}
+                            >
+                              {sum > 0 ? "+" : ""}
+                              {(sum * 100).toFixed(1)}%
+                            </span>
+                          )
+                        })()}
+                      </Card>
+                    </div>
+                    {modifierMap[
+                      `${selectedTurbine?.x ?? 0},${selectedTurbine?.y ?? 0}`
+                    ]?.length > 0 && (
+                      <Card className='flex flex-col justify-between gap-4 p-4 flex-1 w-full'>
+                        <span className='font-semibold text-lg border-b -mx-4 px-4 pb-4'>
+                          Modifier list:
+                        </span>
+
+                        <ul>
+                          {modifierMap[
+                            `${selectedTurbine?.x ?? 0},${selectedTurbine?.y ?? 0}`
+                          ]?.map(({ type, amount }) => (
+                            <li className='flex items-center gap-2'>
+                              <span>
+                                {{
+                                  lake: "Lake wind boost",
+                                  mountain: "Mountain wind block",
+                                  turbine: "Upwind turbine interference",
+                                }[type] ?? "Unknown modifier"}
+                              </span>
+                              <span
+                                className={cn(
+                                  "ml-auto text-lg font-semibold",
+                                  amount > 0 && "text-green-500",
+                                  amount < 0 && "text-red-500",
+                                )}
+                              >
+                                {amount > 0 ? "+" : ""}
+                                {(amount * 100).toFixed(1)}%
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </Card>
+                    )}
+                  </div>
+
+                  <DialogFooter className='border-t -mx-6 px-6 pt-6'>
+                    <Button className='w-full' onClick={() => setOpen(false)}>
+                      <X /> Close
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </Card>
           <Card className='flex-[2] flex flex-col'>
