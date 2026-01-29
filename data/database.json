@@ -141,7 +141,7 @@
           "x": 2,
           "y": 1,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 3,
@@ -327,7 +327,7 @@
           "x": 13,
           "y": 2,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 14,
@@ -693,7 +693,7 @@
           "x": 14,
           "y": 5,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 15,
@@ -957,7 +957,7 @@
           "x": 18,
           "y": 7,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 19,
@@ -969,7 +969,7 @@
           "x": 0,
           "y": 8,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 1,
@@ -1011,7 +1011,7 @@
           "x": 7,
           "y": 8,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 8,
@@ -1329,7 +1329,7 @@
           "x": 0,
           "y": 11,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 1,
@@ -1593,7 +1593,7 @@
           "x": 4,
           "y": 13,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 5,
@@ -1665,7 +1665,7 @@
           "x": 16,
           "y": 13,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 17,
@@ -1953,7 +1953,7 @@
           "x": 4,
           "y": 16,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 5,
@@ -2109,7 +2109,7 @@
           "x": 10,
           "y": 17,
           "type": "Grass",
-          "hasTurbine": false
+          "hasTurbine": true
         },
         {
           "x": 11,
