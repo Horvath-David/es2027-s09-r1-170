@@ -2,6 +2,6 @@ FROM node:23-alpine
 EXPOSE 3000
 WORKDIR /json-server
 
-RUN npm install json-server
+RUN npm install json-server@0.17.4
 
-CMD ["npx", "json-server", "/data/database.json"]
+CMD ["npx", "json-server", "/data/database.json", "--host", "0.0.0.0"]

@@ -9,7 +9,7 @@ Made as part of the EuroSkills 2027 competition's Hungarian national selector, r
 - Frontend: [Next.js 15](https://nextjs.org/) with TypeScript
 - Data source: [json-server](https://www.npmjs.com/package/json-server) (required by the competition's rules)
 - Styling: [Tailwind CSS](https://tailwindcss.com/), [Shadcn UI](https://ui.shadcn.com/)
-- Package Manager: [PNPM](https://pnpm.io/) via [Corepack](https://nodejs.org/api/corepack.html)
+- Package Manager: [PNPM](https://pnpm.io/)
 
 ## Features:
 

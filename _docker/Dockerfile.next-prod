@@ -2,7 +2,7 @@ FROM node:23-alpine AS builder
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@9.14.4 --activate
+RUN npm install -g pnpm@9.14.4
 
 COPY package.json ./
 COPY pnpm-lock.yaml* ./
@@ -23,7 +23,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 ENV PORT 8000
 ENV HOSTNAME "0.0.0.0"
 
-RUN corepack enable && corepack prepare pnpm@9.14.4 --activate
+RUN npm install -g pnpm@9.14.4
 
 COPY package.json ./
 COPY pnpm-lock.yaml* ./
