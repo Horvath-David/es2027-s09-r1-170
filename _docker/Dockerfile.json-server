@@ -1,0 +1,7 @@
+FROM node:23-alpine
+EXPOSE 3000
+WORKDIR /json-server
+
+RUN npm install json-server
+
+CMD ["npx", "json-server", "/data/database.json"]

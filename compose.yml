@@ -1,0 +1,29 @@
+services:
+  json-server:
+    build:
+      context: .
+      dockerfile: _docker/Dockerfile.json-server
+    pull_policy: build
+    restart: always
+    stop_grace_period: 1s
+    volumes:
+      - ./data/:/data
+    ports:
+      - 3000:3000
+
+  next:
+    build:
+      context: .
+      dockerfile: _docker/Dockerfile.next-dev
+    pull_policy: build
+    restart: always
+    depends_on:
+      - json-server
+    environment:
+      NEXT_PUBLIC_BASE_URL: "http://localhost:3001"
+      INTERNAL_API_URL: "http://localhost:8000/api"
+      JSON_SERVER_URL: "http://json-server:3000"
+    volumes:
+      - ./:/app
+    ports:
+      - 3001:8000
